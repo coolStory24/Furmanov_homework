@@ -5,7 +5,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 import com.application.bookService.dto.BookRequest;
 import com.application.bookService.dto.BookResponse;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,6 @@ import org.springframework.test.annotation.DirtiesContext;
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class BookControllerTest {
-
   @Autowired private TestRestTemplate rest;
 
   @Test
@@ -85,8 +83,6 @@ class BookControllerTest {
     assertEquals(new HashSet<>(List.of("Sci-Fi")), updatedBook.tags());
   }
 
-
-
   @Test
   void delete() {
     ResponseEntity<BookResponse.CreateBook> createBookResponseEntity =
@@ -116,4 +112,3 @@ class BookControllerTest {
     assertEquals(HttpStatus.NOT_FOUND, notFoundResponseEntity.getStatusCode());
   }
 }
-

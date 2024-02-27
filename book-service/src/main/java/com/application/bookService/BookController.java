@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,6 +60,15 @@ public class BookController {
   public void delete(
       @NotNull @PathVariable @Max(value = Integer.MAX_VALUE) @Min(value = 0) Integer id) {
     this.bookService.deleteBook(id);
+  }
+
+  // get books by tag if tag is not null, all books otherwise
+  @GetMapping("/view")
+  public String viewBooks(Model model, @RequestParam(required = false) String tag) {
+    List<BookResponse.GetBook> books = bookService.getAllBooks(tag);
+
+    model.addAttribute("books", books);
+    return "books";
   }
 
   @ExceptionHandler

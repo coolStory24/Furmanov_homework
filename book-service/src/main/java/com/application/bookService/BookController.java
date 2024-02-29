@@ -1,7 +1,9 @@
 package com.application.bookService;
 
-import com.application.bookService.dto.BookRequest;
-import com.application.bookService.dto.BookResponse;
+import com.application.bookService.dto.BookRequest.CreateBookRequest;
+import com.application.bookService.dto.BookRequest.UpdateBookRequest;
+import com.application.bookService.dto.BookResponse.CreateBookResponse;
+import com.application.bookService.dto.BookResponse.GetBookResponse;
 import com.application.bookService.exception.BookExceptions;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -31,14 +33,14 @@ public class BookController {
   @Operation(summary = "Create a book")
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
-  public BookResponse.CreateBook create(@NotNull @RequestBody @Valid BookRequest.CreateBook body) {
+  public CreateBookResponse create(@NotNull @RequestBody @Valid CreateBookRequest body) {
     return this.bookService.createBook(body.title(), body.author(), body.tags());
   }
 
   @Operation(summary = "Get a book by its id")
   @GetMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public BookResponse.GetBook getById(
+  public GetBookResponse getById(
       @NotNull @PathVariable @Max(value = Integer.MAX_VALUE) @Min(value = 0) Integer id)
       throws BookExceptions.BookNotFoundException {
     return this.bookService.findBookById(id);
@@ -49,7 +51,7 @@ public class BookController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void update(
       @NotNull @PathVariable @Max(value = Integer.MAX_VALUE) @Min(value = 0) Integer id,
-      @NotNull @RequestBody @Valid BookRequest.UpdateBook body)
+      @NotNull @RequestBody @Valid UpdateBookRequest body)
       throws BookExceptions.BookNotFoundException {
     this.bookService.updateBook(id, body.title(), body.author(), body.tags());
   }
@@ -65,7 +67,7 @@ public class BookController {
   // get books by tag if tag is not null, all books otherwise
   @GetMapping("/view")
   public String viewBooks(Model model, @RequestParam(required = false) String tag) {
-    List<BookResponse.GetBook> books = bookService.getAllBooks(tag);
+    List<GetBookResponse> books = bookService.getAllBooks(tag);
 
     model.addAttribute("books", books);
     return "books";

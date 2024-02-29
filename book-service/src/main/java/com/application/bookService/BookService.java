@@ -1,6 +1,7 @@
 package com.application.bookService;
 
-import com.application.bookService.dto.BookResponse;
+import com.application.bookService.dto.BookResponse.CreateBookResponse;
+import com.application.bookService.dto.BookResponse.GetBookResponse;
 import com.application.bookService.exception.BookExceptions;
 import java.util.HashSet;
 import java.util.List;
@@ -16,23 +17,22 @@ public class BookService {
     this.bookRepository = bookRepository;
   }
 
-  public BookResponse.CreateBook createBook(String title, String author, List<String> tags) {
+  public CreateBookResponse createBook(String title, String author, List<String> tags) {
     var book = bookRepository.createBook(title, author, new HashSet<>(tags));
-    return new BookResponse.CreateBook(book.id(), book.title(), book.author(), book.getTagList());
+    return new CreateBookResponse(book.id(), book.title(), book.author(), book.getTagList());
   }
 
-  public BookResponse.GetBook findBookById(Integer id) throws BookExceptions.BookNotFoundException {
+  public GetBookResponse findBookById(Integer id) throws BookExceptions.BookNotFoundException {
     var book = bookRepository.findBookById(id);
-    return new BookResponse.GetBook(book.id(), book.title(), book.author(), book.getTagList());
+    return new GetBookResponse(book.id(), book.title(), book.author(), book.getTagList());
   }
 
-  public List<BookResponse.GetBook> getAllBooks(String tag) {
+  public List<GetBookResponse> getAllBooks(String tag) {
     var books = (tag == null ? bookRepository.getAllBooks() : bookRepository.getAllBooksByTag(tag));
     return books.stream()
         .map(
             (book ->
-                new BookResponse.GetBook(
-                    book.id(), book.title(), book.author(), book.getTagList())))
+                new GetBookResponse(book.id(), book.title(), book.author(), book.getTagList())))
         .toList();
   }
 

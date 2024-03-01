@@ -3,9 +3,8 @@ package com.application.bookService;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-import com.application.bookService.dto.BookRequest.CreateBookRequest;
-import com.application.bookService.dto.BookRequest.UpdateBookRequest;
-import com.application.bookService.dto.BookResponse.CreateBookResponse;
+import com.application.bookService.dto.BookRequest;
+import com.application.bookService.dto.BookResponse;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,16 +25,16 @@ class BookControllerTest {
 
   @Test
   void shouldCreateAndGetBook() {
-    ResponseEntity<CreateBookResponse> createBookResponseEntity =
-        rest.postForEntity(
-            "/api/books",
-            new CreateBookRequest(
-                "New book", "Michael", List.of("Breathtaking", "Science fiction")),
-            CreateBookResponse.class);
+    ResponseEntity<BookResponse.CreateBook> createBookResponseEntity =
+      rest.postForEntity(
+        "/api/books",
+        new BookRequest.CreateBook(
+          "New book", "Michael", List.of("Breathtaking", "Science fiction")),
+        BookResponse.CreateBook.class);
     assertTrue(
       createBookResponseEntity.getStatusCode().is2xxSuccessful(),
       "Unexpected status code: " + createBookResponseEntity);
-    CreateBookResponse createBookResponseBody = createBookResponseEntity.getBody();
+    BookResponse.CreateBook createBookResponseBody = createBookResponseEntity.getBody();
 
     assertNotNull(createBookResponseBody);
 
@@ -53,23 +52,23 @@ class BookControllerTest {
 
   @Test
   void update() {
-    ResponseEntity<CreateBookResponse> createBookResponseEntity =
-        rest.postForEntity(
-            "/api/books",
-            new CreateBookRequest("Book to Update", "John", List.of("Adventure")),
-            CreateBookResponse.class);
+    ResponseEntity<BookResponse.CreateBook> createBookResponseEntity =
+      rest.postForEntity(
+        "/api/books",
+        new BookRequest.CreateBook("Book to Update", "John", List.of("Adventure")),
+        BookResponse.CreateBook.class);
     assertTrue(createBookResponseEntity.getStatusCode().is2xxSuccessful());
 
-    CreateBookResponse createdBook = createBookResponseEntity.getBody();
+    BookResponse.CreateBook createdBook = createBookResponseEntity.getBody();
     assertNotNull(createdBook);
 
     ResponseEntity<Void> updateResponseEntity =
-        rest.exchange(
-            "/api/books/{id}",
-            HttpMethod.PUT,
-            new HttpEntity<>(new UpdateBookRequest("Updated Book", "Jane", List.of("Sci-Fi"))),
-            Void.class,
-            createdBook.id());
+      rest.exchange(
+        "/api/books/{id}",
+        HttpMethod.PUT,
+        new HttpEntity<>(new BookRequest.UpdateBook("Updated Book", "Jane", List.of("Sci-Fi"))),
+        Void.class,
+        createdBook.id());
 
     assertTrue(updateResponseEntity.getStatusCode().is2xxSuccessful());
 
@@ -86,14 +85,14 @@ class BookControllerTest {
 
   @Test
   void delete() {
-    ResponseEntity<CreateBookResponse> createBookResponseEntity =
-        rest.postForEntity(
-            "/api/books",
-            new CreateBookRequest("Book to Delete", "John", List.of("Thriller")),
-            CreateBookResponse.class);
+    ResponseEntity<BookResponse.CreateBook> createBookResponseEntity =
+      rest.postForEntity(
+        "/api/books",
+        new BookRequest.CreateBook("Book to Delete", "John", List.of("Thriller")),
+        BookResponse.CreateBook.class);
     assertTrue(createBookResponseEntity.getStatusCode().is2xxSuccessful());
 
-    CreateBookResponse createdBook = createBookResponseEntity.getBody();
+    BookResponse.CreateBook createdBook = createBookResponseEntity.getBody();
     assertNotNull(createdBook);
 
     ResponseEntity<Void> deleteResponseEntity =

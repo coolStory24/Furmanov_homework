@@ -9,7 +9,6 @@ import com.application.bookService.book.exceptions.BookNotFoundException;
 import com.application.bookService.tag.exceptions.TagNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +41,7 @@ public class BookController {
   @Operation(summary = "Get a book by its id")
   @GetMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public GetBookResponse getById(
-      @NotNull @PathVariable @Max(value = Long.MAX_VALUE) @Min(value = 0) Long id)
+  public GetBookResponse getById(@NotNull @PathVariable @Min(value = 0) Long id)
       throws BookNotFoundException {
     return this.bookService.getBookById(id);
   }
@@ -59,7 +57,7 @@ public class BookController {
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void update(
-      @NotNull @PathVariable @Max(value = Long.MAX_VALUE) @Min(value = 0) Long id,
+      @NotNull @PathVariable @Min(value = 0) Long id,
       @NotNull @RequestBody @Valid UpdateBookRequest body)
       throws BookNotFoundException {
     this.bookService.updateBook(id, body.title(), body.authorId());
@@ -69,7 +67,7 @@ public class BookController {
   @PostMapping("/{bookId}/add_tag/{tagId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void addTag(
-      @NotNull @PathVariable("bookId") @Max(value = Long.MAX_VALUE) @Min(value = 0) Long bookId,
+      @NotNull @PathVariable("bookId") @Min(value = 0) Long bookId,
       @NotNull @PathVariable("tagId") String tagId)
       throws BookNotFoundException, TagNotFoundException {
     this.bookService.addTag(bookId, tagId);
@@ -78,7 +76,7 @@ public class BookController {
   @Operation(summary = "Delete a book")
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@NotNull @PathVariable @Max(value = Long.MAX_VALUE) @Min(value = 0) Long id) {
+  public void delete(@NotNull @PathVariable @Min(value = 0) Long id) {
     this.bookService.deleteBook(id);
   }
 
@@ -86,7 +84,7 @@ public class BookController {
   @DeleteMapping("/{bookId}/remove_tag/{tagId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void removeTag(
-      @NotNull @PathVariable("bookId") @Max(value = Long.MAX_VALUE) @Min(value = 0) Long bookId,
+      @NotNull @PathVariable("bookId") @Min(value = 0) Long bookId,
       @NotNull @PathVariable("tagId") String tagId)
       throws BookNotFoundException, TagNotFoundException {
     this.bookService.removeTag(bookId, tagId);

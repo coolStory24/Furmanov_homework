@@ -38,7 +38,7 @@ public class AuthorController {
   @GetMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
   public GetAuthorResponse getById(
-      @NotNull @PathVariable @Max(value = Long.MAX_VALUE) @Min(value = 0L) Long id)
+      @NotNull @PathVariable @Min(value = 0L) Long id)
       throws AuthorNotFoundException {
     return authorService.getAuthorById(id);
   }
@@ -47,7 +47,7 @@ public class AuthorController {
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void update(
-      @NotNull @PathVariable @Max(value = Long.MAX_VALUE) @Min(value = 0L) Long id,
+      @NotNull @PathVariable @Min(value = 0L) Long id,
       @NotNull @RequestBody @Valid CreateAuthorRequest body)
       throws AuthorNotFoundException {
     authorService.updateAuthor(id, body.firstName(), body.lastName());
@@ -56,7 +56,7 @@ public class AuthorController {
   @Operation(summary = "Delete author")
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@NotNull @PathVariable @Max(value = Long.MAX_VALUE) @Min(value = 0L) Long id)
+  public void delete(@NotNull @PathVariable @Min(value = 0L) Long id)
       throws AuthorNotFoundException {
     authorService.deleteAuthor(id);
   }

@@ -9,15 +9,19 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Автор</th>
+        <th>Автор Имя</th>
+        <th>Фамилия</th>
         <th>Название</th>
+        <th>Тэги</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="book:${books}">
         <td th:text="${book.id}"></td>
-        <td th:text="${book.title}"></td>
-        <td th:text="${book.author}"></td>
+        <td th:text="${book.author.firstName}"></td>
+        <td th:text="${book.author.lastName}"></td>
+        <td th:text="${book.author.id}"></td>
+        <td th:text="${book.tags.size()}"></td>
     </tr>
     </tbody>
 </table>

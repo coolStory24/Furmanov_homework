@@ -6,6 +6,7 @@ import com.application.bookService.DatabaseSuite;
 import com.application.bookService.author.AuthorService;
 import com.application.bookService.author.exceptions.AuthorNotFoundException;
 import com.application.bookService.book.exceptions.BookNotFoundException;
+import com.application.bookService.book.exceptions.IsNotAuthorException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -24,7 +25,7 @@ class BookServiceTest extends DatabaseSuite {
   @Autowired private AuthorService authorService;
 
   @Test
-  void CreateBookTest() throws AuthorNotFoundException {
+  void CreateBookTest() throws AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("George", "Orwell");
     var book = bookService.createBook("1984", author.id());
 
@@ -32,7 +33,8 @@ class BookServiceTest extends DatabaseSuite {
   }
 
   @Test
-  void getBookByIdTest() throws BookNotFoundException, AuthorNotFoundException {
+  void getBookByIdTest()
+      throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("J.K.", "Rowling");
 
     var book = bookService.createBook("Harry Potter", author.id());
@@ -46,7 +48,8 @@ class BookServiceTest extends DatabaseSuite {
   }
 
   @Test
-  void updateBookTest() throws BookNotFoundException, AuthorNotFoundException {
+  void updateBookTest()
+      throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("Jane", "Austen");
 
     var book = bookService.createBook("Pride and Prejudice", author.id());
@@ -59,7 +62,7 @@ class BookServiceTest extends DatabaseSuite {
   }
 
   @Test
-  void deleteBookTest() throws BookNotFoundException, AuthorNotFoundException {
+  void deleteBookTest() throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("Leo", "Tolstoy");
 
     var book = bookService.createBook("War and Peace", author.id());

@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @DataJpaTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -27,7 +29,7 @@ class BookServiceTest extends DatabaseSuite {
   @Test
   void CreateBookTest() throws AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("George", "Orwell");
-    var book = bookService.createBook("1984", author.id());
+    var book = bookService.createBook("1984", author.id(), UUID.randomUUID().toString());
 
     assertEquals(book.title(), "1984");
   }
@@ -37,7 +39,7 @@ class BookServiceTest extends DatabaseSuite {
       throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("J.K.", "Rowling");
 
-    var book = bookService.createBook("Harry Potter", author.id());
+    var book = bookService.createBook("Harry Potter", author.id(), UUID.randomUUID().toString());
 
     var retrievedBook = bookService.getBookById(book.id());
 
@@ -52,7 +54,8 @@ class BookServiceTest extends DatabaseSuite {
       throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("Jane", "Austen");
 
-    var book = bookService.createBook("Pride and Prejudice", author.id());
+    var book =
+        bookService.createBook("Pride and Prejudice", author.id(), UUID.randomUUID().toString());
 
     bookService.updateBook(book.id(), "Sense and Sensibility", author.id());
 
@@ -62,10 +65,11 @@ class BookServiceTest extends DatabaseSuite {
   }
 
   @Test
-  void deleteBookTest() throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
+  void deleteBookTest()
+      throws BookNotFoundException, AuthorNotFoundException, IsNotAuthorException {
     var author = authorService.createAuthor("Leo", "Tolstoy");
 
-    var book = bookService.createBook("War and Peace", author.id());
+    var book = bookService.createBook("War and Peace", author.id(), UUID.randomUUID().toString());
 
     bookService.deleteBook(book.id());
 

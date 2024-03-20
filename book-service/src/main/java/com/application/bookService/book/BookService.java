@@ -13,13 +13,12 @@ import com.application.bookService.tag.Tag;
 import com.application.bookService.tag.TagRepository;
 import com.application.bookService.tag.dto.response.GetTagResponse;
 import com.application.bookService.tag.exceptions.TagNotFoundException;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpEntity;
@@ -36,7 +35,7 @@ public class BookService {
   private final BookRepository bookRepository;
   private final TagRepository tagRepository;
   private final AuthorRepository authorRepository;
-  private final RestTemplate restTemplate;
+  public final RestTemplate restTemplate;
 
   @Autowired
   public BookService(
@@ -65,8 +64,8 @@ public class BookService {
       }
 
       HttpHeaders headers = new HttpHeaders();
-      // фиксируем уникальный request-id
-      headers.add("X-REQUEST-ID", UUID.randomUUID().toString());
+
+      headers.add("X-REQUEST-ID", requestId);
 
       ResponseEntity<GetAuthorRegistryResponse> authorRegistry =
           restTemplate.exchange(

@@ -24,15 +24,18 @@ public class AuthorRegistryRepository {
     bookAuthor.put("A Symphony of Secrets", new AuthorInfo("Liam", "Thomas"));
     bookAuthor.put("Waltz of Illusions", new AuthorInfo("Ava", "Brown"));
     bookAuthor.put("Legends of the Lost Realm", new AuthorInfo("Gabriel", "Smith"));
+    bookAuthor.put("Brave New World", new AuthorInfo("Aldous", "Huxley"));
   }
 
   public boolean isAuthor(String bookName, AuthorInfo authorInfo) {
+    System.out.println(bookName + " -   -- - - - -- - - - - - - - - -- ----- - - -");
     var author = this.bookAuthor.getOrDefault(bookName, null);
 
     if (author == null) {
       return false;
     }
 
-    return Objects.equals(author.firstName(), authorInfo.firstName()) && Objects.equals(author.lastName() , authorInfo.lastName());
+    return Objects.equals(author.firstName(), authorInfo.firstName())
+        && Objects.equals(author.lastName(), authorInfo.lastName());
   }
 }

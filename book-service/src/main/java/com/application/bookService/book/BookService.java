@@ -53,7 +53,7 @@ public class BookService {
 
   @RateLimiter(name = "createBook", fallbackMethod = "fallbackRateLimiter")
   @CircuitBreaker(name = "createBook", fallbackMethod = "fallbackCircuitBreaker")
-  @Retry(name = "createBook")
+  @Retry(name = "createBook", fallbackMethod = "fallbackRetry")
   @Transactional(
       propagation = Propagation.REQUIRES_NEW,
       rollbackFor = {Throwable.class})
@@ -189,6 +189,11 @@ public class BookService {
   }
 
   public CreateBookResponse fallbackCircuitBreaker(
+      String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
+    throw new CreateBookException(e.getMessage(), e);
+  }
+
+  public CreateBookResponse fallbackRetry(
       String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
     throw new CreateBookException(e.getMessage(), e);
   }

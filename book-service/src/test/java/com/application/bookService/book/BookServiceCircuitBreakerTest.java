@@ -9,7 +9,7 @@ import com.application.bookService.author.AuthorService;
 import com.application.bookService.authorRegistry.dto.GetAuthorRegistryRequest;
 import com.application.bookService.authorRegistry.dto.GetAuthorRegistryResponse;
 import com.application.bookService.book.exceptions.CreateBookException;
-import io.github.resilience4j.springboot3.ratelimiter.autoconfigure.RateLimiterAutoConfiguration;
+import io.github.resilience4j.springboot3.circuitbreaker.autoconfigure.CircuitBreakerAutoConfiguration;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -33,7 +33,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({BookService.class, AuthorService.class, RateLimiterAutoConfiguration.class})
+@Import({BookService.class, AuthorService.class, CircuitBreakerAutoConfiguration.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @EnableAspectJAutoProxy
 @TestPropertySource(locations = "classpath:test.properties")

@@ -1,10 +1,10 @@
 package com.application.bookService.book;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockserver.model.HttpRequest.request;
 
 import com.application.bookService.DatabaseSuite;
-// import com.application.bookService.TestConfig;
 import com.application.bookService.TestConfig;
 import com.application.bookService.author.AuthorService;
 import com.application.bookService.author.exceptions.AuthorNotFoundException;
@@ -20,10 +20,12 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -34,6 +36,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({BookService.class, AuthorService.class, TestConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class BookServiceTest extends DatabaseSuite {
   @Autowired private AuthorService authorService;
 
@@ -65,17 +68,6 @@ class BookServiceTest extends DatabaseSuite {
 
   @Test
   public void CreateBookTest() throws AuthorNotFoundException, IsNotAuthorException {
-    var client = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
-    client
-        .when(
-            request()
-                .withMethod(String.valueOf(HttpMethod.POST))
-                .withHeader("X-REQUEST-ID")
-                .withPath("/api/author-registry"))
-        .respond(
-            new HttpResponse()
-                .withBody("{\"isAuthor\": \"true\"}")
-                .withHeader("Content-Type", "application/json"));
 
     var author = authorService.createAuthor("George", "Orwell");
     var book = bookService.createBook("1984", author.id(), UUID.randomUUID().toString());
@@ -123,5 +115,29 @@ class BookServiceTest extends DatabaseSuite {
     bookService.deleteBook(book.id());
 
     assertThrows(BookNotFoundException.class, () -> bookService.getBookById(book.id()));
+  }
+
+  @Test
+  void shouldThrowTimeoutException() {
+    var client = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
+    client
+        .when(
+            request()
+                .withMethod(String.valueOf(HttpMethod.POST))
+                .withHeader("X-REQUEST-ID")
+                .withPath("/api/author-registry"))
+        .respond(
+            req -> {
+              Thread.sleep(10000);
+              return new HttpResponse()
+                  .withBody("{\"isAuthor\": \"true\"}")
+                  .withHeader("Content-Type", "application/json");
+            });
+
+    var author = authorService.createAuthor("J.K.", "Rowling");
+
+    assertThrows(
+        RestClientException.class,
+        () -> bookService.createBook("Harry Porter", author.id(), UUID.randomUUID().toString()));
   }
 }

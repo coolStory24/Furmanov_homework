@@ -8,6 +8,7 @@ import com.application.bookService.authorRegistry.dto.GetAuthorRegistryResponse;
 import com.application.bookService.book.dto.response.CreateBookResponse;
 import com.application.bookService.book.dto.response.GetBookResponse;
 import com.application.bookService.book.exceptions.BookNotFoundException;
+import com.application.bookService.book.exceptions.CreateBookException;
 import com.application.bookService.book.exceptions.IsNotAuthorException;
 import com.application.bookService.tag.Tag;
 import com.application.bookService.tag.TagRepository;
@@ -50,8 +51,8 @@ public class BookService {
   }
 
   @RateLimiter(name = "createBook", fallbackMethod = "fallbackRateLimiter")
-  @CircuitBreaker(name = "createBook", fallbackMethod = "fallbackCircuitBreaker")
-  @Retry(name = "createBook")
+    @CircuitBreaker(name = "createBook", fallbackMethod = "fallbackCircuitBreaker")
+    @Retry(name = "createBook")
   @Transactional(
       propagation = Propagation.REQUIRES_NEW,
       rollbackFor = {Throwable.class})
@@ -178,4 +179,15 @@ public class BookService {
   public void deleteBook(Long id) {
     bookRepository.deleteById(id);
   }
+
+  public CreateBookResponse fallbackRateLimiter(
+      String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
+    throw new CreateBookException(e.getMessage(), e);
+  }
+
+    public CreateBookResponse fallbackCircuitBreaker(
+        String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
+      System.out.println("-----------\n--\n---\n---------\n");
+      throw new CreateBookException(e.getMessage(), e);
+    }
 }

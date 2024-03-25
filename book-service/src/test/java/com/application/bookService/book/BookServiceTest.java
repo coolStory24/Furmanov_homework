@@ -11,7 +11,7 @@ import com.application.bookService.author.exceptions.AuthorNotFoundException;
 import com.application.bookService.book.exceptions.BookNotFoundException;
 import com.application.bookService.book.exceptions.IsNotAuthorException;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.HttpResponse;
@@ -25,7 +25,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 import org.testcontainers.containers.MockServerContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -36,7 +35,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({BookService.class, AuthorService.class, TestConfig.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class BookServiceTest extends DatabaseSuite {
   @Autowired private AuthorService authorService;
 
@@ -46,8 +45,8 @@ class BookServiceTest extends DatabaseSuite {
   public static final MockServerContainer mockServer =
       new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.13.2"));
 
-  @BeforeEach
-  void setUp() {
+  @BeforeAll
+  static void setUp() {
     var client = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
     client
         .when(
@@ -115,29 +114,5 @@ class BookServiceTest extends DatabaseSuite {
     bookService.deleteBook(book.id());
 
     assertThrows(BookNotFoundException.class, () -> bookService.getBookById(book.id()));
-  }
-
-  @Test
-  void shouldThrowTimeoutException() {
-    var client = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
-    client
-        .when(
-            request()
-                .withMethod(String.valueOf(HttpMethod.POST))
-                .withHeader("X-REQUEST-ID")
-                .withPath("/api/author-registry"))
-        .respond(
-            req -> {
-              Thread.sleep(10000);
-              return new HttpResponse()
-                  .withBody("{\"isAuthor\": \"true\"}")
-                  .withHeader("Content-Type", "application/json");
-            });
-
-    var author = authorService.createAuthor("J.K.", "Rowling");
-
-    assertThrows(
-        RestClientException.class,
-        () -> bookService.createBook("Harry Porter", author.id(), UUID.randomUUID().toString()));
   }
 }

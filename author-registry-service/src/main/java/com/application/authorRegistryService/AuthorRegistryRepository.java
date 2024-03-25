@@ -1,11 +1,9 @@
 package com.application.authorRegistryService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class AuthorRegistryRepository {
@@ -28,7 +26,6 @@ public class AuthorRegistryRepository {
   }
 
   public boolean isAuthor(String bookName, AuthorInfo authorInfo) {
-    System.out.println(bookName + " -   -- - - - -- - - - - - - - - -- ----- - - -");
     var author = this.bookAuthor.getOrDefault(bookName, null);
 
     if (author == null) {

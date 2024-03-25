@@ -14,7 +14,6 @@ public class RestTemplateConfiguration {
       @Value("${author-registry.service.base.url}") String baseUrl,
       @Value("${book.service.timeout.seconds}") long secondsTimeout) {
     Duration timeout = Duration.ofSeconds(secondsTimeout);
-    System.out.println(secondsTimeout);
     return new RestTemplateBuilder()
         .setConnectTimeout(timeout)
         .setReadTimeout(timeout)

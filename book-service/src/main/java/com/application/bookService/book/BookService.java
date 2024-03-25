@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -51,8 +52,8 @@ public class BookService {
   }
 
   @RateLimiter(name = "createBook", fallbackMethod = "fallbackRateLimiter")
-    @CircuitBreaker(name = "createBook", fallbackMethod = "fallbackCircuitBreaker")
-    @Retry(name = "createBook")
+  @CircuitBreaker(name = "createBook", fallbackMethod = "fallbackCircuitBreaker")
+  @Retry(name = "createBook")
   @Transactional(
       propagation = Propagation.REQUIRES_NEW,
       rollbackFor = {Throwable.class})
@@ -86,6 +87,8 @@ public class BookService {
           createdBook.getId(), createdBook.getTitle(), createdBook.getAuthorId());
     } catch (DataIntegrityViolationException e) {
       throw new AuthorNotFoundException(authorId);
+    } catch (RestClientException e) {
+      throw new RestClientException("Unsuccessful request to author registry service");
     }
   }
 
@@ -185,9 +188,8 @@ public class BookService {
     throw new CreateBookException(e.getMessage(), e);
   }
 
-    public CreateBookResponse fallbackCircuitBreaker(
-        String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
-      System.out.println("-----------\n--\n---\n---------\n");
-      throw new CreateBookException(e.getMessage(), e);
-    }
+  public CreateBookResponse fallbackCircuitBreaker(
+      String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
+    throw new CreateBookException(e.getMessage(), e);
+  }
 }

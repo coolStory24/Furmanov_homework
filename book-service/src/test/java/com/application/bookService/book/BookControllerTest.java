@@ -31,7 +31,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 class BookControllerTest {
   @Autowired private TestRestTemplate rest;

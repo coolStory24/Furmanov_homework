@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class AuthorRegistryControllerTest {
   @Autowired private TestRestTemplate rest;
 

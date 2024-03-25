@@ -30,7 +30,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import({BookService.class, AuthorService.class, TestConfig.class})
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class BookServiceTimeoutTest extends DatabaseSuite {
   @Autowired private AuthorService authorService;
 

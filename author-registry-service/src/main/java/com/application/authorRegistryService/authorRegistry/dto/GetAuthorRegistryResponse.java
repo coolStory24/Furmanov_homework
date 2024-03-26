@@ -1,3 +1,3 @@
 package com.application.authorRegistryService.authorRegistry.dto;
 
-record GetAuthorRegistryResponse(Boolean isAuthor) {}
+public record GetAuthorRegistryResponse(Boolean isAuthor) {}

@@ -2,6 +2,7 @@ package com.application.bookService.book;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockserver.model.HttpRequest.request;
 
 import com.application.bookService.TestDataSourceConfiguration;
 import com.application.bookService.author.dto.request.CreateAuthorRequest;
@@ -12,21 +13,52 @@ import com.application.bookService.book.dto.response.GetBookResponse;
 import com.application.bookService.tag.dto.request.CreateTagRequest;
 import com.application.bookService.tag.dto.response.CreateTagResponse;
 import org.junit.jupiter.api.Test;
+import org.mockserver.client.MockServerClient;
+import org.mockserver.model.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MockServerContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
+@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @ContextConfiguration(classes = TestDataSourceConfiguration.class)
 class BookControllerTest {
   @Autowired private TestRestTemplate rest;
 
+  @Container
+  public static final MockServerContainer mockServer =
+      new MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.13.2"));
+
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry registry) {
+    registry.add("author-registry.service.base.url", mockServer::getEndpoint);
+  }
+
   @Test
   void bookE2ETest() {
+    var client = new MockServerClient(mockServer.getHost(), mockServer.getServerPort());
+    client
+        .when(
+            request()
+                .withMethod(String.valueOf(HttpMethod.POST))
+                .withHeader("X-REQUEST-ID")
+                .withPath("/api/author-registry"))
+        .respond(
+            new HttpResponse()
+                .withBody("{\"isAuthor\": \"true\"}")
+                .withHeader("Content-Type", "application/json"));
+
     ResponseEntity<CreateTagResponse> createTagResponseEntity1 =
         rest.postForEntity(
             "/api/tags", new CreateTagRequest("Science Fiction"), CreateTagResponse.class);

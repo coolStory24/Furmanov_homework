@@ -6,11 +6,13 @@ import com.application.bookService.book.dto.request.UpdateBookRequest;
 import com.application.bookService.book.dto.response.CreateBookResponse;
 import com.application.bookService.book.dto.response.GetBookResponse;
 import com.application.bookService.book.exceptions.BookNotFoundException;
+import com.application.bookService.book.exceptions.IsNotAuthorException;
 import com.application.bookService.tag.exceptions.TagNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import java.util.List;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,8 +36,8 @@ public class BookController {
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
   public CreateBookResponse create(@NotNull @RequestBody @Valid CreateBookRequest body)
-      throws AuthorNotFoundException {
-    return this.bookService.createBook(body.title(), body.authorId());
+      throws AuthorNotFoundException, IsNotAuthorException {
+    return this.bookService.createBook(body.title(), body.authorId(), UUID.randomUUID().toString());
   }
 
   @Operation(summary = "Get a book by its id")

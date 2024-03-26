@@ -11,6 +11,7 @@
     <modules>
         <module>book-service</module>
         <module>author-registry-service</module>
+        <module>book-rating-service</module>
     </modules>
 
 </project>

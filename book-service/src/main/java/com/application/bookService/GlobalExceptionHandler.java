@@ -1,5 +1,6 @@
 package com.application.bookService;
 
+import com.application.bookService.book.exceptions.BookRatingException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,5 +16,11 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleConstraintViolationException(
       ConstraintViolationException ex) {
     return new ResponseEntity<>("Validation error: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(BookRatingException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<String> handleBookRatingException(BookRatingException ex) {
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
 }

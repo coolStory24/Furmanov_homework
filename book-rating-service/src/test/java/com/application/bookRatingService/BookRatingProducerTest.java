@@ -14,10 +14,12 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -47,13 +49,13 @@ class BookRatingProducerTest {
   public static final KafkaContainer KAFKA =
       new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
 
-  //  @MockBean private RatingService ratingService;
+  @MockBean private RatingService ratingService;
   @Autowired private BookRatingProducer bookRatingProducer;
   @Autowired private ObjectMapper objectMapper;
 
   @Test
   void shouldSendMessageToKafkaSuccessfully() {
-    //    Mockito.when(ratingService.getRating(anyLong())).thenReturn(1.1);
+    Mockito.when(ratingService.getRating(1L)).thenReturn(4.5);
 
     assertDoesNotThrow(() -> bookRatingProducer.stubBookRating(1L));
 
@@ -73,7 +75,7 @@ class BookRatingProducerTest {
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }
-              assertEquals(eq(new BookRatingMessageResponse(1L, anyDouble())), message);
+              assertEquals(new BookRatingMessageResponse(1L, 4.5), message);
             });
   }
 

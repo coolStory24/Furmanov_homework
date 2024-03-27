@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,12 +22,12 @@ public class BookRatingConsumer {
   }
 
   @KafkaListener(topics = {"${topic-to-consume-message}"})
-  public void processBookRatingCalculationRequest(String message, Acknowledgment acknowledgment)
+  public void processBookRatingCalculationRequest(String message)
       throws JsonProcessingException, InterruptedException {
     BookRatingMessageRequest parsedMessage =
         objectMapper.readValue(message, BookRatingMessageRequest.class);
+
     LOGGER.info("Retrieved message {}", message);
     bookRatingProducer.stubBookRating(parsedMessage.bookId());
-    acknowledgment.acknowledge();
   }
 }

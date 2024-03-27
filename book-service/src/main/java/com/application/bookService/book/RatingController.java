@@ -14,15 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/books-rating")
 @Validated
 public class RatingController {
-  @Autowired
-  private final BookRatingProducer bookRatingProducer;
+  @Autowired private final BookRatingProducer bookRatingProducer;
 
   public RatingController(BookRatingProducer bookRatingProducer) {
     this.bookRatingProducer = bookRatingProducer;
   }
 
   @PostMapping("/{bookId}")
-  public void checkLicense(@PathVariable @NotNull Long bookId) throws JsonProcessingException {
+  public void calculateRating(@PathVariable @NotNull Long bookId) throws JsonProcessingException {
     bookRatingProducer.sendBookRatingCalculationRequest(bookId);
   }
 }

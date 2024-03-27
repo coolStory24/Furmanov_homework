@@ -23,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -31,6 +32,7 @@ import org.testcontainers.utility.DockerImageName;
 @SpringBootTest(
     classes = {BookRatingProducer.class, RatingService.class},
     properties = {"topic-to-send-message=some-test-topic"})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @Import({
   KafkaAutoConfiguration.class,
   BookRatingProducerTest.ObjectMapperTestConfig.class,

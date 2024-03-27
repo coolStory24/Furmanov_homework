@@ -22,13 +22,13 @@ public class BookRatingProducer {
   private final ObjectMapper objectMapper;
   private final String topic;
 
-  @Autowired
-  private final RatingService ratingService;
+  @Autowired private final RatingService ratingService;
 
   public BookRatingProducer(
-    KafkaTemplate<String, String> kafkaTemplate,
-    ObjectMapper objectMapper,
-    @Value("${topic-to-send-message}") String topic, RatingService ratingService) {
+      KafkaTemplate<String, String> kafkaTemplate,
+      ObjectMapper objectMapper,
+      @Value("${topic-to-send-message}") String topic,
+      RatingService ratingService) {
     this.kafkaTemplate = kafkaTemplate;
     this.objectMapper = objectMapper;
     this.topic = topic;
@@ -38,7 +38,6 @@ public class BookRatingProducer {
   public void stubBookRating(@PathVariable @NotNull Long bookId)
       throws JsonProcessingException, InterruptedException {
     // mocking calculation
-    Thread.sleep(500);
 
     var rating = ratingService.getRating(bookId);
 

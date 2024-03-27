@@ -32,9 +32,6 @@ public class BookRatingConsumer {
 
     LOGGER.info("Retrieved message {}", message);
 
-    System.out.println("---------\n-------\n---------\n-----");
-    System.out.println(message);
-
     bookService.updateRating(parsedMessage.bookId(), parsedMessage.rating());
   }
 }

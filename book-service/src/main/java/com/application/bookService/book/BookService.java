@@ -17,6 +17,7 @@ import com.application.bookService.tag.exceptions.TagNotFoundException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -174,6 +175,18 @@ public class BookService {
     }
 
     book.getTags().remove(tag);
+
+    bookRepository.save(book);
+  }
+
+  public void updateRating(Long bookId, Double rating) throws BookNotFoundException {
+    var book = bookRepository.findById(bookId).orElse(null);
+
+    if (book == null) {
+      throw new BookNotFoundException(bookId);
+    }
+
+    book.setRating(BigDecimal.valueOf(rating));
 
     bookRepository.save(book);
   }

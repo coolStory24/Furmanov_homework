@@ -8,6 +8,7 @@ import com.application.bookService.author.Author;
 import com.application.bookService.tag.Tag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.*;
 import lombok.*;
 
@@ -25,6 +26,10 @@ public class Book {
   @Setter
   @NotNull(message = "Book title have to be filled")
   private String title;
+
+  @Setter
+  @Column(name = "rating", nullable = false, precision = 3, scale = 2)
+  private BigDecimal rating = BigDecimal.ZERO;
 
   @ManyToOne(fetch = EAGER)
   @JoinColumn(name = "author_id", insertable = false, updatable = false)

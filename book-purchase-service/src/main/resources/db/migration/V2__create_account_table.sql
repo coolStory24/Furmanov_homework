@@ -1,0 +1,5 @@
+CREATE TABLE account
+(
+    id BIGSERIAL PRIMARY KEY,
+    amount BIGINT NOT NULL DEFAULT 0
+);

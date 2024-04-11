@@ -5,6 +5,7 @@ import com.application.bookService.author.dto.response.GetAuthorResponse;
 import com.application.bookService.author.exceptions.AuthorNotFoundException;
 import com.application.bookService.authorRegistry.dto.GetAuthorRegistryRequest;
 import com.application.bookService.authorRegistry.dto.GetAuthorRegistryResponse;
+import com.application.bookService.book.dto.response.BuyBookResponse;
 import com.application.bookService.book.dto.response.CreateBookResponse;
 import com.application.bookService.book.dto.response.GetBookResponse;
 import com.application.bookService.book.exceptions.BookNotFoundException;
@@ -209,5 +210,38 @@ public class BookService {
   public CreateBookResponse fallbackRetry(
       String title, Long authorId, String requestId, Throwable e) throws CreateBookException {
     throw new CreateBookException(e.getMessage(), e);
+  }
+
+  public BuyBookResponse buyById(Long bookId) throws BookNotFoundException {
+    var book = bookRepository.findById(bookId).orElse(null);
+
+    if (book == null) {
+      throw new BookNotFoundException(bookId);
+    }
+
+    switch (book.getStatus()) {
+      case PAYMENT_PENDING -> {
+        return new BuyBookResponse("Payment is already in progress");
+      }
+      case PAYMENT_SUCCEED -> {
+        return new BuyBookResponse("Payment has been already finished");
+      }
+    }
+
+    book.setPaymentStatusPending(UUID.randomUUID());
+    bookRepository.save(book);
+
+    return new BuyBookResponse("Waiting for payment...");
+  }
+
+  public void updateBookPurchaseStatus(Long bookId, PaymentStatus status)
+      throws BookNotFoundException {
+    var book = bookRepository.findById(bookId).orElse(null);
+
+    if (book == null) {
+      throw new BookNotFoundException(bookId);
+    }
+
+    book.setStatus(status);
   }
 }

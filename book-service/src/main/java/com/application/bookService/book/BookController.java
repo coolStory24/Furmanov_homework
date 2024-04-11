@@ -3,6 +3,7 @@ package com.application.bookService.book;
 import com.application.bookService.author.exceptions.AuthorNotFoundException;
 import com.application.bookService.book.dto.request.CreateBookRequest;
 import com.application.bookService.book.dto.request.UpdateBookRequest;
+import com.application.bookService.book.dto.response.BuyBookResponse;
 import com.application.bookService.book.dto.response.CreateBookResponse;
 import com.application.bookService.book.dto.response.GetBookResponse;
 import com.application.bookService.book.exceptions.BookNotFoundException;
@@ -90,6 +91,14 @@ public class BookController {
       @NotNull @PathVariable("tagId") String tagId)
       throws BookNotFoundException, TagNotFoundException {
     this.bookService.removeTag(bookId, tagId);
+  }
+
+  @Operation(summary = "Buy a book by bookId")
+  @PostMapping("buy/{bookId}")
+  @ResponseStatus(HttpStatus.OK)
+  public BuyBookResponse buy(@NotNull @PathVariable("bookId") @Min(value = 0) Long bookId)
+      throws BookNotFoundException {
+    return this.bookService.buyById(bookId);
   }
 
   @ExceptionHandler

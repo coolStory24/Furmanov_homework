@@ -5,12 +5,14 @@ import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.FetchType.LAZY;
 
 import com.application.bookService.author.Author;
+import com.application.bookService.book.events.BookStatusUpdatedEvent;
 import com.application.bookService.tag.Tag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.*;
 import lombok.*;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 @Entity
 @Table(name = "books")
@@ -18,7 +20,7 @@ import lombok.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class Book {
+public class Book extends AbstractAggregateRoot<Book> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -45,6 +47,18 @@ public class Book {
       joinColumns = @JoinColumn(name = "book_id"),
       inverseJoinColumns = @JoinColumn(name = "tag_id"))
   private Set<Tag> tags = new HashSet<>();
+
+  @Enumerated(EnumType.STRING)
+  @Setter
+  @Column(name = "status", nullable = false)
+  private PaymentStatus status = PaymentStatus.NO_PAYMENT;
+
+  public Book(String title, Long authorId, PaymentStatus paymentStatus) {}
+
+  public void setPaymentStatusPending(UUID messageId) {
+    this.setStatus(PaymentStatus.PAYMENT_PENDING);
+    registerEvent(new BookStatusUpdatedEvent(this.id, this.status, messageId.toString()));
+  }
 
   public Book(String title, Long authorId) {
     this.title = title;

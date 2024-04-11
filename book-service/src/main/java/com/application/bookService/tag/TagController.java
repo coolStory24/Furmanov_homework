@@ -33,8 +33,8 @@ public class TagController {
     return tagService.createTag(body.name());
   }
 
-  @Operation(summary = "Get tag by id")
-  @GetMapping("/{id}")
+  @Operation(summary = "Get tag by bookId")
+  @GetMapping("/{bookId}")
   @ResponseStatus(HttpStatus.OK)
   public GetTagResponse getById(
       @Pattern(
@@ -48,7 +48,7 @@ public class TagController {
   }
 
   @Operation(summary = "Update tag")
-  @PutMapping("/{id}")
+  @PutMapping("/{bookId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void update(
       @Pattern(
@@ -63,7 +63,7 @@ public class TagController {
   }
 
   @Operation(summary = "Delete tag")
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{bookId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(
       @Pattern(

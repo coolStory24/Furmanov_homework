@@ -28,7 +28,7 @@ public class OutboxScheduler {
   }
 
   @Transactional
-  @Scheduled(fixedDelay = 10_000)
+  @Scheduled(fixedDelay = 1000)
   public void processOutbox() {
     List<OutboxEntity> result = outboxRepository.findAllBySendEquals(false);
     for (OutboxEntity outboxRecord : result) {

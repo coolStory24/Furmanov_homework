@@ -12,12 +12,15 @@ import com.application.bookService.book.dto.response.CreateBookResponse;
 import com.application.bookService.book.dto.response.GetBookResponse;
 import com.application.bookService.tag.dto.request.CreateTagRequest;
 import com.application.bookService.tag.dto.response.CreateTagResponse;
+import com.github.dockerjava.zerodep.shaded.org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
@@ -59,23 +62,35 @@ class BookControllerTest {
                 .withBody("{\"isAuthor\": \"true\"}")
                 .withHeader("Content-Type", "application/json"));
 
+    var headers = new HttpHeaders();
+    String base64AuthCredentials =
+        new String(Base64.encodeBase64("test_admin:strong_password".getBytes()));
+    headers.add("Authorization", "Basic " + base64AuthCredentials);
+
     ResponseEntity<CreateTagResponse> createTagResponseEntity1 =
-        rest.postForEntity(
-            "/api/tags", new CreateTagRequest("Science Fiction"), CreateTagResponse.class);
+        rest.exchange(
+            "/api/tags",
+            HttpMethod.POST,
+            new HttpEntity<>(new CreateTagRequest("Science Fiction"), headers),
+            CreateTagResponse.class);
 
     assertNotNull(createTagResponseEntity1.getBody());
     assertEquals(createTagResponseEntity1.getBody().name(), "Science Fiction");
 
     ResponseEntity<CreateTagResponse> createTagResponseEntity2 =
-        rest.postForEntity(
-            "/api/tags", new CreateTagRequest("Future Society"), CreateTagResponse.class);
+        rest.exchange(
+            "/api/tags",
+            HttpMethod.POST,
+            new HttpEntity<>(new CreateTagRequest("Future Society"), headers),
+            CreateTagResponse.class);
 
     assertNotNull(createTagResponseEntity2.getBody());
 
     ResponseEntity<CreateAuthorResponse> createAuthorResponseEntity =
-        rest.postForEntity(
+        rest.exchange(
             "/api/authors",
-            new CreateAuthorRequest("Aldous", "Huxley"),
+            HttpMethod.POST,
+            new HttpEntity<>(new CreateAuthorRequest("Aldous", "Huxley"), headers),
             CreateAuthorResponse.class);
 
     assertNotNull(createAuthorResponseEntity.getBody());
@@ -83,34 +98,41 @@ class BookControllerTest {
     assertEquals(createAuthorResponseEntity.getBody().lastName(), "Huxley");
 
     ResponseEntity<CreateBookResponse> createBookResponseEntity =
-        rest.postForEntity(
+        rest.exchange(
             "/api/books",
-            new CreateBookRequest("Brave New World", createAuthorResponseEntity.getBody().id()),
+            HttpMethod.POST,
+            new HttpEntity<>(
+                new CreateBookRequest("Brave New World", createAuthorResponseEntity.getBody().id()),
+                headers),
             CreateBookResponse.class);
 
     assertNotNull(createBookResponseEntity.getBody());
     assertEquals(createBookResponseEntity.getBody().title(), "Brave New World");
 
-    rest.postForEntity(
+    rest.exchange(
         "/api/books/"
             + createBookResponseEntity.getBody().id()
             + "/add_tag/"
             + createTagResponseEntity1.getBody().id(),
-        null,
+        HttpMethod.POST,
+        new HttpEntity<>(null, headers),
         Object.class);
 
-    var res =
-        rest.postForEntity(
-            "/api/books/"
-                + createBookResponseEntity.getBody().id()
-                + "/add_tag/"
-                + createTagResponseEntity2.getBody().id(),
-            null,
-            Object.class);
+    rest.exchange(
+        "/api/books/"
+            + createBookResponseEntity.getBody().id()
+            + "/add_tag/"
+            + createTagResponseEntity2.getBody().id(),
+        HttpMethod.POST,
+        new HttpEntity<>(null, headers),
+        Object.class);
 
     ResponseEntity<GetBookResponse> getBookResponseEntity =
-        rest.getForEntity(
-            "/api/books/" + createBookResponseEntity.getBody().id(), GetBookResponse.class);
+        rest.exchange(
+            "/api/books/" + createBookResponseEntity.getBody().id(),
+            HttpMethod.GET,
+            new HttpEntity<>(headers),
+            GetBookResponse.class);
 
     assertNotNull(getBookResponseEntity.getBody());
     assertEquals(getBookResponseEntity.getBody().author().firstName(), "Aldous");

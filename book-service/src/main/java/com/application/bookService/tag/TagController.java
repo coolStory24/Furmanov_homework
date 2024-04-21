@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class TagController {
   @Operation(summary = "Create a tag")
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public CreateTagResponse create(@RequestBody @Valid CreateTagRequest body) {
     return tagService.createTag(body.name());
   }
@@ -36,6 +38,7 @@ public class TagController {
   @Operation(summary = "Get tag by bookId")
   @GetMapping("/{bookId}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("isAuthenticated()")
   public GetTagResponse getById(
       @Pattern(
               regexp =
@@ -50,6 +53,7 @@ public class TagController {
   @Operation(summary = "Update tag")
   @PutMapping("/{bookId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public void update(
       @Pattern(
               regexp =
@@ -65,6 +69,7 @@ public class TagController {
   @Operation(summary = "Delete tag")
   @DeleteMapping("/{bookId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public void delete(
       @Pattern(
               regexp =

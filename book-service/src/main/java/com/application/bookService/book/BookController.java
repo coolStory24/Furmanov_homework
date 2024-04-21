@@ -12,12 +12,12 @@ import com.application.bookService.tag.exceptions.TagNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +36,7 @@ public class BookController {
   @Operation(summary = "Create a book")
   @PostMapping()
   @ResponseStatus(HttpStatus.CREATED)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public CreateBookResponse create(@NotNull @RequestBody @Valid CreateBookRequest body)
       throws AuthorNotFoundException, IsNotAuthorException {
     return this.bookService.createBook(body.title(), body.authorId(), UUID.randomUUID().toString());
@@ -44,6 +45,7 @@ public class BookController {
   @Operation(summary = "Get a book by its id")
   @GetMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("isAuthenticated()")
   public GetBookResponse getById(@NotNull @PathVariable @Min(value = 0) Long id)
       throws BookNotFoundException {
     return this.bookService.getBookById(id);
@@ -52,6 +54,7 @@ public class BookController {
   @Operation(summary = "Get all books")
   @GetMapping("/all")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("isAuthenticated()")
   public List<GetBookResponse> getAll() {
     return this.bookService.getAllBooks();
   }
@@ -59,6 +62,7 @@ public class BookController {
   @Operation(summary = "Update a book")
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public void update(
       @NotNull @PathVariable @Min(value = 0) Long id,
       @NotNull @RequestBody @Valid UpdateBookRequest body)
@@ -69,6 +73,7 @@ public class BookController {
   @Operation(summary = "Add tag by id")
   @PostMapping("/{bookId}/add_tag/{tagId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public void addTag(
       @NotNull @PathVariable("bookId") @Min(value = 0) Long bookId,
       @NotNull @PathVariable("tagId") String tagId)
@@ -79,6 +84,7 @@ public class BookController {
   @Operation(summary = "Delete a book")
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public void delete(@NotNull @PathVariable @Min(value = 0) Long id) {
     this.bookService.deleteBook(id);
   }
@@ -86,6 +92,7 @@ public class BookController {
   @Operation(summary = "Delete tag from book by id")
   @DeleteMapping("/{bookId}/remove_tag/{tagId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PreAuthorize("hasAuthority('ADMIN')")
   public void removeTag(
       @NotNull @PathVariable("bookId") @Min(value = 0) Long bookId,
       @NotNull @PathVariable("tagId") String tagId)
@@ -96,6 +103,7 @@ public class BookController {
   @Operation(summary = "Buy a book by bookId")
   @PostMapping("buy/{bookId}")
   @ResponseStatus(HttpStatus.OK)
+  @PreAuthorize("hasAuthority('READER')")
   public BuyBookResponse buy(@NotNull @PathVariable("bookId") @Min(value = 0) Long bookId)
       throws BookNotFoundException {
     return this.bookService.buyById(bookId);
